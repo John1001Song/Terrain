@@ -20,6 +20,27 @@
 #   include <GL/freeglut.h>
 #endif
 
+// map size is 300*300
+int xz[300][300] = {};
+
+void initMap(){
+    for (int i = 0; i < 300; i++) {
+        for (int j = 0; j < 300; j++) {
+            xz[i][j] = 0;
+        }
+    }
+}
+
+//generate circle with random position but certain ratio
+void randCir(){}
+
+//keyboard function
+void kbd(){}
+
+
+
+void display(){}
+
 int main(int argc, char * argv[]) {
     
     return 0;
