@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "mesh3D2.h"
+#include "Mesh3D2.cpp"
 
 #ifdef __APPLE__
 #   include <OpenGL/gl.h>
@@ -19,6 +21,8 @@
 #   include <GL/glu.h>
 #   include <GL/freeglut.h>
 #endif
+
+using namespace std;
 
 // map size is 300*300
 int xz[300][300] = {};
