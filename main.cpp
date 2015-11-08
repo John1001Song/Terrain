@@ -25,16 +25,16 @@
 using namespace std;
 
 // map size is 300*300
-int xz[300][300] = {};
+int map[300][300] = {};
 
 //array to store random position and later, update the position array to map array to draw circles
 int randPos[100][2] = {};
 
 
 void initMap(){
-    for (int i = 0; i < 300; i++) {
-        for (int j = 0; j < 300; j++) {
-            xz[i][j] = 0;
+    for (int x = 0; x < 300; x++) {
+        for (int z = 0; z < 300; z++) {
+            map[x][z] = 0;
         }
     }
 }
@@ -59,7 +59,12 @@ void drawCir(vertex3D::vertex3D){
 
 
 //func to generate random position
-void createRanPos(){}
+void createRanPos(){
+    for (int i = 0; i < 100; i++) {
+        randPos[i][0] = rand() % 300;//random number from 0 to 299
+        randPos[i][1] = rand() % 300;
+    }
+}
 
 
 
