@@ -27,6 +27,10 @@ using namespace std;
 // map size is 300*300
 int xz[300][300] = {};
 
+//array to store random position and later, update the position array to map array to draw circles
+int randPos[100][2] = {};
+
+
 void initMap(){
     for (int i = 0; i < 300; i++) {
         for (int j = 0; j < 300; j++) {
@@ -36,7 +40,28 @@ void initMap(){
 }
 
 //generate circle with random position but certain ratio
-void randCir(){}
+
+/*
+ for each terrain point (tx,tz) do
+ 
+	pd = distance from circle center * 2 / terrainCircleSize
+	
+	if fabs(pd) <= 1.0
+ 
+ height(tx,tz) +=  disp/2 + cos(pd*3.14)*disp/2;
+
+ this pseudocode is from http://www.lighthouse3d.com/opengl/terrain/index.php?circles to help with coding
+*/
+
+void drawCir(vertex3D::vertex3D){
+    
+}
+
+
+//func to generate random position
+void createRanPos(){}
+
+
 
 //keyboard function
 void kbd(){}
