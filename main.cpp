@@ -72,7 +72,7 @@ void drawCir(){
                 if (300 > x && x >= 0) {
                     if (300 > z && z >= 0) {
                         map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-
+                        printf("Current point height: %d\n", map[x][z]);
                     }
                 }
             }
@@ -191,7 +191,7 @@ void drawCir(){
 
 
 //func to generate random position
-void createRanPos(){
+void createRandPos(){
     for (int i = 0; i < 100; i++) {
         randPos[i][0] = rand() % 300;//random number from 0 to 299
         randPos[i][1] = rand() % 300;
@@ -201,11 +201,66 @@ void createRanPos(){
 
 
 //keyboard function
-void kbd(){}
+void kbd(unsigned char key, int x, int y){
+    switch (key) {
+        case 'q':
+        case 'Q':
+            exit(0);
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void drawMap(){
+    
+    for (int x = 0; x < 299; x++) {
+        for (int z = 0; z < 299; z++) {
+            glBegin(GL_POLYGON);
+            glColor3f(0.5, 0.5, 0.5);
+            glVertex3i(x, map[x][z],z);
+            glVertex3i(x+1, map[x+1][z], z);
+            glVertex3i(x+1, map[x+1][z+1], z+1);
+            glVertex3i(x, map[x][z+1], z+1);
+            glEnd();
+        }
+    }
+    glFlush();
+}
+
+void drawMapLine(){
+    glBegin(GL_LINE);
+    glColor3f(0, 0, 0);
+    for (int x = 0; x < 299; x++) {
+        for (int z = 0; z < 299; z++) {
+            glBegin(GL_LINE);
+            glColor3f(0, 0, 0);
+            glVertex3i(x, map[x][z], z);
+            glVertex3i(x+1, map[x+1][z], z);
+            glVertex3i(x+1, map[x+1][z+1], z+1);
+            glVertex3i(x, map[x][z+1], z+1);
+            glEnd();
+        }
+    }
+    glFlush();
+}
 
 
 
-void display(){}
+void init(){
+    glClearColor(1, 1, 1, 1);
+    glColor3f(1, 1, 1);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45, 1, 1, 1000);
+    
+}
+
+void display(){
+
+    
+}
 
 int main(int argc, char * argv[]) {
     
