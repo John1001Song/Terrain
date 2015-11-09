@@ -259,10 +259,36 @@ void init(){
 
 void display(){
 
-    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawMapLine();
+    glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 int main(int argc, char * argv[]) {
+    glutInit(&argc, argv);
+    glutInitWindowSize(600, 600);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutCreateWindow("Terrain");
+    
+    glEnable(GL_DEPTH_TEST);
+    
+    init();
+    glutKeyboardFunc(kbd);
+    
+    initMap();
+    
+    createRandPos();
+    
+    drawCir();
+    
+    drawMapLine();
+    
+    glutDisplayFunc(display);
+    
+    glutMainLoop();
+    
+    
     
     return 0;
 }
