@@ -28,7 +28,7 @@ using namespace std;
 float camPos[] = {200, 200, 50};
 
 //light position
-float light_pos[] = {300, 300, 300, 1.0};
+float light_pos[] = {200, 200, 50, 1.0};
 
 //material
 float amb0[4] = {.2, .2, .2, 1};
@@ -184,11 +184,9 @@ void display(){
     
     glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
     
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
-    
+    glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
+    glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
+    glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
     
     drawMap();
     
