@@ -24,7 +24,21 @@
 
 using namespace std;
 
+//camera postion
 float camPos[] = {200, 200, 50};
+
+//light position
+float light_pos[] = {300, 300, 300, 1.0};
+
+//material
+float amb0[4] = {.2, .2, .2, 1};
+float diff0[4] = {1, 1, 1, 1};
+float spec0[4] = {0, 0, 0, 1};
+
+float m_amb[] = {.33, .22, .03, 1.0};
+float m_diff[] = {.78, .57, .11, 1.0};
+float m_spec[] = {.99, .91, .91, 1.0};
+float shiny = 27.8;
 
 // map size is 300*300
 int map[300][300] = {};
@@ -116,10 +130,14 @@ void drawMap(){
     for (int x = 0; x < 299; x++) {
         for (int z = 0; z < 299; z++) {
             
-            glColor3f(x/300, 0.5, z/300);
+            glColor3f(.5, .5, .5);
+            glNormal3i(x, map[x][z], z);
             glVertex3i(x, map[x][z],z);
+            glNormal3i(x+1, map[x+1][z], z);
             glVertex3i(x+1, map[x+1][z], z);
+            glNormal3i(x+1, map[x+1][z+1], z+1);
             glVertex3i(x+1, map[x+1][z+1], z+1);
+            glNormal3i(x, map[x][z+1], z+1);
             glVertex3i(x, map[x][z+1], z+1);
             
         }
@@ -151,7 +169,7 @@ void init(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //gluPerspective(45, 1, 1, 1000);
-    glOrtho(-500, 500, -500, 500, -500, 500);
+    glOrtho(-400, 400, -400, 400, -400, 0);
     
 }
 
@@ -164,8 +182,16 @@ void display(){
     gluLookAt(camPos[0], camPos[1], camPos[2], 0, 0, 0, 0, 1, 0);
     glColor3f(1, 1, 1);
     
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+    
     
     drawMap();
+    
     
     glutSwapBuffers();
     glutPostRedisplay();
@@ -177,7 +203,15 @@ int main(int argc, char * argv[]) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutCreateWindow("Terrain");
     
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    
     glEnable(GL_DEPTH_TEST);
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    glEnable(GL_NORMALIZE);
     
     init();
     
