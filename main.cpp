@@ -164,9 +164,7 @@ void display(){
     gluLookAt(camPos[0], camPos[1], camPos[2], 0, 0, 0, 0, 1, 0);
     glColor3f(1, 1, 1);
     
-    initMap();
-    createRandPos();
-    drawCir();
+    
     drawMap();
     
     glutSwapBuffers();
@@ -182,6 +180,11 @@ int main(int argc, char * argv[]) {
     glEnable(GL_DEPTH_TEST);
     
     init();
+    
+    initMap();
+    createRandPos();
+    drawCir();
+    
     glutKeyboardFunc(kbd);
     
     
