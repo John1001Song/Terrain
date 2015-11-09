@@ -24,7 +24,7 @@
 
 using namespace std;
 
-float camPos[] = {20, 20, 50};
+float camPos[] = {200, 200, 50};
 
 // map size is 300*300
 int map[300][300] = {};
@@ -112,19 +112,20 @@ void kbd(unsigned char key, int x, int y){
 }
 
 void drawMap(){
-    
+    glBegin(GL_POLYGON);
     for (int x = 0; x < 299; x++) {
         for (int z = 0; z < 299; z++) {
-            glBegin(GL_POLYGON);
-            glColor3f(0.5, 0.5, 0.5);
+            
+            glColor3f(x/300, 0.5, z/300);
             glVertex3i(x, map[x][z],z);
             glVertex3i(x+1, map[x+1][z], z);
             glVertex3i(x+1, map[x+1][z+1], z+1);
             glVertex3i(x, map[x][z+1], z+1);
-            glEnd();
+            
         }
     }
-    glFlush();
+    glEnd();
+    
 }
 
 void drawMapLine(){
@@ -149,7 +150,8 @@ void init(){
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, 1, 1, 1000);
+    //gluPerspective(45, 1, 1, 1000);
+    glOrtho(-500, 500, -500, 500, -500, 500);
     
 }
 
@@ -162,9 +164,13 @@ void display(){
     gluLookAt(camPos[0], camPos[1], camPos[2], 0, 0, 0, 0, 1, 0);
     glColor3f(1, 1, 1);
     
-    drawMapLine();
+    initMap();
+    createRandPos();
+    drawCir();
+    drawMap();
+    
     glutSwapBuffers();
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 int main(int argc, char * argv[]) {
@@ -178,13 +184,6 @@ int main(int argc, char * argv[]) {
     init();
     glutKeyboardFunc(kbd);
     
-    initMap();
-    
-    createRandPos();
-    
-    drawCir();
-    
-    drawMapLine();
     
     glutDisplayFunc(display);
     
