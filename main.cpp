@@ -24,6 +24,8 @@
 
 using namespace std;
 
+float camPos[] = {20, 20, 50};
+
 // map size is 300*300
 int map[300][300] = {};
 
@@ -79,122 +81,17 @@ void drawCir(){
         }
     }
         
-        //following is the code to determine if (x, z) is in map 300*300
-        //but it is too redundent with if else statement
-        //just ignore
-        
-        /*
-        
-        
-        
-        if (300-circSize/2 >= centerX && centerX >= 0+circSize/2) {
-            if (300-circSize/2 >= centerZ && centerZ >= 0+circSize/2) {
-                
-                for (int x = centerX - circSize/2; x < centerX + circSize/2; x++) {
-                    int a = sqrtf(x * (circSize-x));
-                    for (int z = centerZ - a; z < centerZ + a; z++) {
-                        map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                    }
-                    
-                }
-            }else{
-                if (centerZ - circSize/2 < 0) {
-                    for (int x = centerX - circSize/2; x < centerX + circSize/2; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = 0; z < centerZ + a; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                    }
-                }
-                if (300 - centerZ < circSize/2) {
-                    for (int x = centerX - circSize/2; x < centerX + circSize/2; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = centerZ - a; z < 300; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                        
-                    }
-                }
-            }
         }
-        else {if (centerX < circSize/2){
-            if (300-circSize/2 >= centerZ && centerZ >= 0+circSize/2) {
-                
-                for (int x = 0; x < centerX + circSize/2; x++) {
-                    int a = sqrtf(x * (circSize-x));
-                    for (int z = centerZ - a; z < centerZ + a; z++) {
-                        map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                    }
-                    
-                }
-            }else{
-                if (centerZ - circSize/2 < 0) {
-                    for (int x = 0; x < centerX + circSize/2; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = 0; z < centerZ + a; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                    }
-                }
-                if (300 - centerZ < circSize/2) {
-                    for (int x = 0; x < centerX + circSize/2; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = centerZ - a; z < 300; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                        
-                    }
-                }
-            }
-
-        }
-        
-            }
-        if (300 - centerX < circSize/2) {
-            if (300-circSize/2 >= centerZ && centerZ >= 0+circSize/2) {
-                
-                for (int x = centerX - circSize/2; x < 300; x++) {
-                    int a = sqrtf(x * (circSize-x));
-                    for (int z = centerZ - a; z < centerZ + a; z++) {
-                        map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                    }
-                    
-                }
-            }else{
-                if (centerZ - circSize/2 < 0) {
-                    for (int x = centerX - circSize/2; x < 300; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = 0; z < centerZ + a; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                    }
-                }
-                if (300 - centerZ < circSize/2) {
-                    for (int x = centerX - circSize/2; x < 300; x++) {
-                        int a = sqrtf(x * (circSize-x));
-                        for (int z = centerZ - a; z < 300; z++) {
-                            map[x][z] += disp/2 + cosf(sqrtf( (x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 3.14) * disp/2;
-                        }
-                        
-                    }
-                }
-            }
-
-        }
-        
-        
-    }
-}
-         
-         */
-}
 
 
 //func to generate random position
 void createRandPos(){
     for (int i = 0; i < 100; i++) {
         randPos[i][0] = rand() % 300;//random number from 0 to 299
+        printf("RandomX: %d", randPos[i][0]);
         randPos[i][1] = rand() % 300;
+        printf(" RandomZ: %d\n", randPos[i][1]);
+
     }
 }
 
@@ -211,6 +108,7 @@ void kbd(unsigned char key, int x, int y){
         default:
             break;
     }
+    glutPostRedisplay();
 }
 
 void drawMap(){
@@ -230,12 +128,10 @@ void drawMap(){
 }
 
 void drawMapLine(){
-    glBegin(GL_LINE);
-    glColor3f(0, 0, 0);
     for (int x = 0; x < 299; x++) {
         for (int z = 0; z < 299; z++) {
             glBegin(GL_LINE);
-            glColor3f(0, 0, 0);
+            glColor3f(1, 0, 0);
             glVertex3i(x, map[x][z], z);
             glVertex3i(x+1, map[x+1][z], z);
             glVertex3i(x+1, map[x+1][z+1], z+1);
@@ -249,7 +145,7 @@ void drawMapLine(){
 
 
 void init(){
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 0);
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -260,9 +156,15 @@ void init(){
 void display(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    gluLookAt(camPos[0], camPos[1], camPos[2], 0, 0, 0, 0, 1, 0);
+    glColor3f(1, 1, 1);
+    
     drawMapLine();
     glutSwapBuffers();
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 int main(int argc, char * argv[]) {
