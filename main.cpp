@@ -24,11 +24,14 @@
 
 using namespace std;
 
+float eye[] = {300, 300, 300};
+
 //camera postion
 float camPos[] = {200, 200, 50};
 
 //light position
-float light_pos[] = {200, 200, 50, 1.0};
+float light_pos[] = {200, 100, 200, 1.0};
+float light_pos2[] = {-200, 30, 200, 1.0};
 
 //material
 float amb0[4] = {.2, .2, .2, 1};
@@ -38,7 +41,7 @@ float spec0[4] = {0, 0, 0, 1};
 float m_amb[] = {.33, .22, .03, 1.0};
 float m_diff[] = {.78, .57, .11, 1.0};
 float m_spec[] = {.99, .91, .91, 1.0};
-float shiny = 27.8;
+float shiny = 50;
 
 // map size is 300*300
 int map[300][300] = {};
@@ -70,7 +73,7 @@ void initMap(){
 */
 
 int circSize = 20;
-int disp = 4;
+int disp = 6;
 void drawCir(){
     for (int indxRadm = 0; indxRadm < 100; indxRadm++) {
         int centerX = randPos[indxRadm][0];
@@ -125,6 +128,28 @@ void kbd(unsigned char key, int x, int y){
     glutPostRedisplay();
 }
 
+void special(int key, int x, int y){
+    switch (key) {
+        case GLUT_KEY_LEFT:
+            eye[0] -= .1;
+            break;
+            
+        case GLUT_KEY_RIGHT:
+            eye[0] += .1;
+            break;
+        
+        case GLUT_KEY_UP:
+            eye[2] += .1;
+            break;
+        case GLUT_KEY_DOWN:
+            eye[2] -=.1;
+            break;
+            
+        default:
+            break;
+    }
+}
+
 void drawMap(){
     glBegin(GL_POLYGON);
     for (int x = 0; x < 299; x++) {
@@ -169,7 +194,7 @@ void init(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //gluPerspective(45, 1, 1, 1000);
-    glOrtho(-400, 400, -400, 400, -400, 0);
+    glOrtho(-350, 350, -350, 350, -350, 350);
     
 }
 
@@ -179,17 +204,27 @@ void display(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    gluLookAt(camPos[0], camPos[1], camPos[2], 0, 0, 0, 0, 1, 0);
+    gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
+    
     glColor3f(1, 1, 1);
     
     glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
+    
+    glPushMatrix();
     
     glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
     glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
     glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
     
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+    
     drawMap();
     
+    glPopMatrix();
     
     glutSwapBuffers();
     glutPostRedisplay();
@@ -203,11 +238,9 @@ int main(int argc, char * argv[]) {
     
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
     
     glEnable(GL_DEPTH_TEST);
-    
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
     
     glEnable(GL_NORMALIZE);
     
@@ -218,7 +251,7 @@ int main(int argc, char * argv[]) {
     drawCir();
     
     glutKeyboardFunc(kbd);
-    
+    glutSpecialFunc(special);
     
     glutDisplayFunc(display);
     
