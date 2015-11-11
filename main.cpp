@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <iostream>
 
 #ifdef __APPLE__
 #   include <OpenGL/gl.h>
@@ -22,10 +23,12 @@
 #endif
 
 using namespace std;
+//map size
+int mapSize;
 
 //angle for rotate with Y or (X and Z)
 int angY = 0;
-int angXZ = 0;
+int angX = 0;
 
 //flag used to switch different map
 int flag_map = 0;
@@ -54,19 +57,30 @@ float m_diff[] = {.78, .57, .11, 1.0};
 float m_spec[] = {.29, .51, .51, 1.0};
 float shiny = 20;
 
-// map size is 300*300
-int map[200][200] = {};
+// map array
+int** map;
 
 //array to store random position and used to update the position array to map array and draw circles
 int randPos[100][2] = {};
 
 
 void initMap(){
-    for (int x = 0; x < 200; x++) {
-        for (int z = 0; z < 200; z++) {
+    int n = mapSize;
+    map = new int*[n];
+    for (int x = 0; x < n; x++) {
+        map[x] = new int[n];
+        for (int z = 0; z < n; z++) {
             map[x][z] = 0;
         }
     }
+}
+
+void deleteMap() {
+    int n = mapSize;
+    for(int i = 0; i < n; i++) {
+        delete[] map[i];
+    }
+    delete[] map;
 }
 
 //generate circle with random position but certain ratio
@@ -83,9 +97,10 @@ void initMap(){
  this pseudocode is from http://www.lighthouse3d.com/opengl/terrain/index.php?circles to help with coding
 */
 
-int circSize = 50;
-int disp = 10;
 void drawCir(){
+    int circSize = mapSize/3;
+    int disp = 2 + (mapSize - 50) / 30;
+//    printf("%d\n", circSize);
     for (int indxRadm = 0; indxRadm < 100; indxRadm++) {
         int centerX = randPos[indxRadm][0];
         int centerZ = randPos[indxRadm][1];
@@ -100,8 +115,8 @@ void drawCir(){
             int a = (int)sqrtf(dx * (circSize - dx));
             int x = xstart + dx;
             for (int z = centerZ - a; z < centerZ + a; z++) {
-                if (200 > x && x >= 0) {
-                    if (200 > z && z >= 0) {
+                if (mapSize > x && x >= 0) {
+                    if (mapSize > z && z >= 0) {
                         int pd = sqrtf((x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 2 / circSize;
                         map[x][z] += disp/2 + cosf(pd * 3.14) * disp/2;
                     }
@@ -109,16 +124,16 @@ void drawCir(){
             }
         }
     }
-        
-        }
+    
+}
 
 
 //func to generate random position
 void createRandPos(){
     srand(time(NULL));
     for (int i = 0; i < 100; i++) {
-        randPos[i][0] = rand() % 200;//random number from 0 to 299
-        randPos[i][1] = rand() % 200;
+        randPos[i][0] = rand() % mapSize;//random number from 0 to 299
+        randPos[i][1] = rand() % mapSize;
     }
 }
 
@@ -145,34 +160,36 @@ void kbd(unsigned char key, int x, int y){
             flag_Light = 1;
             break;
             
-            //rotate with Y axis
-        case 'a':
+            //map rotate with Y axis
+        case 'd':
             angY -= 10;
             break;
             
-            //rotate with Y
-        case 'd':
+            //map rotate with Y
+        case 'f':
             angY += 10;
             break;
             
-            //rotate with X and Z
-        case 'w':
-            angXZ += 10;
+            //map rotate with X
+        case 'e':
+            angX += 10;
             break;
             
-            //rotate with X and Z
-        case 's':
-            angXZ -= 10;
+            //map rotate with X
+        case 'c':
+            angX -= 10;
             break;
          
             //use flag to switch three maps
-        case 'm':
+        case 'w':
+        case 'W':
             flag_map += 1;
             flag_map = flag_map % 3;
             break;
             
             //re-draw the map
         case 'r':
+            deleteMap();
             initMap();
             createRandPos();
             drawCir();
@@ -189,21 +206,34 @@ void kbd(unsigned char key, int x, int y){
 
 //special func to change viewing position
 void special(int key, int x, int y){
+    double ang = 0;
     switch (key) {
+            //view point rotate around Y axis
         case GLUT_KEY_LEFT:
-            eye[0] -= 10;
+            ang += .1;
+            eye[0] = eye[0] * cos(ang) + eye[2] * sin(ang);
+            eye[2] = eye[0] * (-sin(ang)) + eye[2] * cos(ang);
             break;
             
+            //view point rotate around Y axis
         case GLUT_KEY_RIGHT:
-            eye[0] += 10;
+            ang -= .1;
+            eye[0] = eye[0] * cos(ang) + eye[2] * sin(ang);
+            eye[2] = eye[0] * (-sin(ang)) + eye[2] * cos(ang);
             break;
         
+            //view point rotate around X axis
         case GLUT_KEY_UP:
-            eye[2] += 10;
+            ang -= .1;
+            eye[1] = eye[1] * cos(ang) - eye[2] * sin(ang);
+            eye[2] = eye[1] * (sin(ang)) + eye[2] * cos(ang);
             break;
             
+            //view point rotate around X axis
         case GLUT_KEY_DOWN:
-            eye[2] -= 10;
+            ang += .1;
+            eye[1] = eye[1] * cos(ang) - eye[2] * sin(ang);
+            eye[2] = eye[1] * (sin(ang)) + eye[2] * cos(ang);
             break;
         
         default:
@@ -213,10 +243,13 @@ void special(int key, int x, int y){
 
 //draw the map and same time normalize the polygon
 void drawMap(){
-    for (int x = 0; x < 199; x++) {
-        for (int z = 0; z < 199; z++) {
+    int n = mapSize - 1;
+    for (int x = 0; x < n; x++) {
+        for (int z = 0; z < n; z++) {
             glBegin(GL_POLYGON);
-            float mod = 1.0 * map[x][z] / 100;
+            int div = 10 + (mapSize - 50) / 3;
+            float mod = 1.0 * map[x][z] / div;
+
             glColor3f(mod/4, mod/2, mod/4);
             glNormal3i(x, map[x][z], z);
             glVertex3i(x, map[x][z],z);
@@ -234,8 +267,9 @@ void drawMap(){
 
 //draw map with line
 void drawMapLine(){
-    for (int x = 0; x < 199; x++) {
-        for (int z = 0; z < 199; z++) {
+    int n = mapSize - 1;
+    for (int x = 0; x < n; x++) {
+        for (int z = 0; z < n; z++) {
             glBegin(GL_LINES);
             
             glColor3f(1, 1, 1);
@@ -323,7 +357,7 @@ void display(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
+    
     
     //drawAxis();
     
@@ -331,8 +365,10 @@ void display(){
     
     glPushMatrix();
     
+    gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
+    
     glRotated(angY, 0, 1, 0);
-    glRotated(angXZ, 1, 0, 1);
+    glRotated(angX, 1, 0, 0);
     
     //switch maps
     if (flag_map == 0) {
@@ -360,6 +396,10 @@ void display(){
 }
 
 int main(int argc, char * argv[]) {
+    
+    cout << "Please enter the map size: ";
+    cin >> mapSize;
+    
     glutInit(&argc, argv);
     glutInitWindowSize(800, 800);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -372,6 +412,12 @@ int main(int argc, char * argv[]) {
     initMap();
     createRandPos();
     drawCir();
+    
+    for (int x = 0; x < mapSize; x++) {
+        for (int z = 0; z < mapSize; z++) {
+            printf("At (%d, %d), height is: %d\n", x, z, map[x][z]);
+        }
+    }
     
     glutKeyboardFunc(kbd);
    
