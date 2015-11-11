@@ -23,35 +23,43 @@
 
 using namespace std;
 
-float eye[] = {50, 50, 50};
+int flag_Light;
+int angY = 0;
+int angXZ = 0;
+int flag_map = 0;
+
+int flag_redraw;
+
+float eye[] = {250, 250, 250};
 
 //camera postion
 float camPos[] = {200, 200, 50};
 
 //light position
-float light_pos[] = {.8, .7, .6, 0};
-float light_pos2[] = {-200, 30, 200, 1};
+float light_pos[] = {0, 0, 0, 1};
+float light_pos2[] = {200, 300, 200, 1};
 
-//material
-float amb0[4] = {.2, .32, .2, 1};
+//light
+float amb0[4] = {1, 1, 1, 1};
 float diff0[4] = {.31, .31, .31, 1};
 float spec0[4] = {.2, 0.2, 0.1, 1};
 
+//material
 float m_amb[] = {.33, .22, .22, 1.0};
 float m_diff[] = {.78, .57, .11, 1.0};
 float m_spec[] = {.29, .51, .51, 1.0};
 float shiny = 20;
 
 // map size is 300*300
-int map[300][300] = {};
+int map[200][200] = {};
 
 //array to store random position and later, update the position array to map array to draw circles
 int randPos[100][2] = {};
 
 
 void initMap(){
-    for (int x = 0; x < 300; x++) {
-        for (int z = 0; z < 300; z++) {
+    for (int x = 0; x < 200; x++) {
+        for (int z = 0; z < 200; z++) {
             map[x][z] = 0;
         }
     }
@@ -71,7 +79,7 @@ void initMap(){
  this pseudocode is from http://www.lighthouse3d.com/opengl/terrain/index.php?circles to help with coding
 */
 
-int circSize = 100;
+int circSize = 50;
 int disp = 10;
 void drawCir(){
     for (int indxRadm = 0; indxRadm < 100; indxRadm++) {
@@ -88,8 +96,8 @@ void drawCir(){
             int a = (int)sqrtf(dx * (circSize - dx));
             int x = xstart + dx;
             for (int z = centerZ - a; z < centerZ + a; z++) {
-                if (300 > x && x >= 0) {
-                    if (300 > z && z >= 0) {
+                if (200 > x && x >= 0) {
+                    if (200 > z && z >= 0) {
                         int pd = sqrtf((x-centerX)*(x-centerX)+(z-centerZ)*(z-centerZ)) * 2 / circSize;
                         map[x][z] += disp/2 + cosf(pd * 3.14) * disp/2;
                     }
@@ -105,8 +113,8 @@ void drawCir(){
 void createRandPos(){
     srand(time(NULL));
     for (int i = 0; i < 100; i++) {
-        randPos[i][0] = rand() % 300;//random number from 0 to 299
-        randPos[i][1] = rand() % 300;
+        randPos[i][0] = rand() % 200;//random number from 0 to 299
+        randPos[i][1] = rand() % 200;
     }
 }
 
@@ -118,6 +126,44 @@ void kbd(unsigned char key, int x, int y){
         case 'q':
         case 'Q':
             exit(0);
+            break;
+            
+        case 'l':
+        case 'L':
+            flag_Light = 0;
+            break;
+            
+        case 'k':
+        case 'K':
+            flag_Light = 1;
+            break;
+
+        case 'a':
+            angY -= 10;
+            break;
+            
+        case 'd':
+            angY += 10;
+            break;
+            
+        case 'w':
+            angXZ += 10;
+            break;
+            
+        case 's':
+            angXZ -= 10;
+            break;
+         
+        case 'm':
+            flag_map += 1;
+            flag_map = flag_map % 3;
+            break;
+            
+        case 'r':
+            flag_redraw = 1;
+            initMap();
+            createRandPos();
+            drawCir();
             break;
             
         default:
@@ -142,15 +188,15 @@ void special(int key, int x, int y){
         case GLUT_KEY_DOWN:
             eye[2] -= 10;
             break;
-            
+        
         default:
             break;
     }
 }
 
 void drawMap(){
-    for (int x = 0; x < 299; x++) {
-        for (int z = 0; z < 299; z++) {
+    for (int x = 0; x < 199; x++) {
+        for (int z = 0; z < 199; z++) {
             glBegin(GL_POLYGON);
             float mod = 1.0 * map[x][z] / 100;
             glColor3f(mod/4, mod/2, mod/4);
@@ -169,8 +215,8 @@ void drawMap(){
 }
 
 void drawMapLine(){
-    for (int x = 0; x < 299; x++) {
-        for (int z = 0; z < 299; z++) {
+    for (int x = 0; x < 199; x++) {
+        for (int z = 0; z < 199; z++) {
             glBegin(GL_LINES);
             
             glColor3f(1, 1, 1);
@@ -218,26 +264,31 @@ void init(){
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //gluPerspective(45, 1, 1, 100);
-    glOrtho(-250, 250, -250, 250, -250, 250);
+    gluPerspective(63, 1, 700, 1);
+    //glOrtho(-250, 250, -250, 250, -250, 250);
     
-    glShadeModel(GL_SMOOTH);
+    //glShadeModel(GL_SMOOTH);
     
-    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-    glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
+    
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    //glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
 
-    glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
-    glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
-    glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
+    //glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
+    //glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
+    //glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
     
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
+    //glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+    
+    
     
     //glEnable(GL_LIGHTING);
     //glEnable(GL_LIGHT0);
     //glEnable(GL_LIGHT1);
+    
+    
     
     glEnable(GL_DEPTH_TEST);
 
@@ -255,14 +306,23 @@ void display(){
     
     glColor3f(1, 1, 1);
     
-    
     glPushMatrix();
     
+    glRotated(angY, 0, 1, 0);
+    glRotated(angXZ, 1, 0, 1);
     
+    if (flag_map == 0) {
+        drawMap();
+    }
     
-    //drawMap();
+    if (flag_map == 1) {
+        drawMapLine();
+    }
     
-    drawMapLine();
+    if (flag_map == 2) {
+        drawMap();
+        drawMapLine();
+    }
     
     glPopMatrix();
     
@@ -279,16 +339,24 @@ int main(int argc, char * argv[]) {
     
     glEnable(GL_NORMALIZE);
     
+    
     init();
     
     initMap();
+    
+    if (flag_redraw == 1) {
+        createRandPos();
+        flag_redraw = 0;
+    }
+    
     createRandPos();
     drawCir();
     
     
     glutKeyboardFunc(kbd);
+   
     glutSpecialFunc(special);
-    
+ 
     glutDisplayFunc(display);
     
     glutMainLoop();
