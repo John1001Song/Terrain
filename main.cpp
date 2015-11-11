@@ -23,17 +23,21 @@
 
 using namespace std;
 
-int flag_Light;
+//angle for rotate with Y or (X and Z)
 int angY = 0;
 int angXZ = 0;
+
+//flag used to switch different map
 int flag_map = 0;
 
-int flag_redraw;
+//flag used to turn on/off the light
+int flag_Light;
 
+//flag used to draw axis
+int flag_axis = 0;
+
+//inital viewing position
 float eye[] = {250, 250, 250};
-
-//camera postion
-float camPos[] = {200, 200, 50};
 
 //light position
 float light_pos[] = {0, 0, 0, 1};
@@ -53,7 +57,7 @@ float shiny = 20;
 // map size is 300*300
 int map[200][200] = {};
 
-//array to store random position and later, update the position array to map array to draw circles
+//array to store random position and used to update the position array to map array and draw circles
 int randPos[100][2] = {};
 
 
@@ -123,47 +127,59 @@ void createRandPos(){
 //keyboard function
 void kbd(unsigned char key, int x, int y){
     switch (key) {
+            //press q or Q to exit
         case 'q':
         case 'Q':
             exit(0);
             break;
             
+            //press l or L to turn on light
         case 'l':
         case 'L':
             flag_Light = 0;
             break;
             
+            //turn off light
         case 'k':
         case 'K':
             flag_Light = 1;
             break;
-
+            
+            //rotate with Y axis
         case 'a':
             angY -= 10;
             break;
             
+            //rotate with Y
         case 'd':
             angY += 10;
             break;
             
+            //rotate with X and Z
         case 'w':
             angXZ += 10;
             break;
             
+            //rotate with X and Z
         case 's':
             angXZ -= 10;
             break;
          
+            //use flag to switch three maps
         case 'm':
             flag_map += 1;
             flag_map = flag_map % 3;
             break;
             
+            //re-draw the map
         case 'r':
-            flag_redraw = 1;
             initMap();
             createRandPos();
             drawCir();
+            break;
+            
+        case 'h':
+            flag_axis++;
             break;
             
         default:
@@ -171,6 +187,7 @@ void kbd(unsigned char key, int x, int y){
     }
 }
 
+//special func to change viewing position
 void special(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_LEFT:
@@ -194,6 +211,7 @@ void special(int key, int x, int y){
     }
 }
 
+//draw the map and same time normalize the polygon
 void drawMap(){
     for (int x = 0; x < 199; x++) {
         for (int z = 0; z < 199; z++) {
@@ -214,6 +232,7 @@ void drawMap(){
     
 }
 
+//draw map with line
 void drawMapLine(){
     for (int x = 0; x < 199; x++) {
         for (int z = 0; z < 199; z++) {
@@ -242,6 +261,7 @@ void drawMapLine(){
 /* drawAxis() -- draws an axis at the origin of the coordinate system
  *   red = +X axis, green = +Y axis, blue = +Z axis
  */
+//draw axis to find XYZ direction
 void drawAxis()
 {
     glBegin(GL_LINES);
@@ -259,11 +279,13 @@ void drawAxis()
     glEnd();
 }
 
+//inital background etc
 void init(){
     glClearColor(0, 0, 0, 1);
     glColor3f(1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    //perpective viewing mode helps viewer to catch and distinguish lines; if in ortho viewing mode, lines are too close and combined to a face
     gluPerspective(63, 1, 700, 1);
     //glOrtho(-250, 250, -250, 250, -250, 250);
     
@@ -294,6 +316,7 @@ void init(){
 
 }
 
+
 void display(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -302,7 +325,7 @@ void display(){
     
     gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
     
-    drawAxis();
+    //drawAxis();
     
     glColor3f(1, 1, 1);
     
@@ -311,6 +334,7 @@ void display(){
     glRotated(angY, 0, 1, 0);
     glRotated(angXZ, 1, 0, 1);
     
+    //switch maps
     if (flag_map == 0) {
         drawMap();
     }
@@ -322,6 +346,11 @@ void display(){
     if (flag_map == 2) {
         drawMap();
         drawMapLine();
+    }
+    
+    //draw axis or not
+    if (flag_axis%2 == 1) {
+        drawAxis();
     }
     
     glPopMatrix();
@@ -336,22 +365,13 @@ int main(int argc, char * argv[]) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutCreateWindow("Terrain");
     
-    
     glEnable(GL_NORMALIZE);
-    
     
     init();
     
     initMap();
-    
-    if (flag_redraw == 1) {
-        createRandPos();
-        flag_redraw = 0;
-    }
-    
     createRandPos();
     drawCir();
-    
     
     glutKeyboardFunc(kbd);
    
@@ -360,8 +380,6 @@ int main(int argc, char * argv[]) {
     glutDisplayFunc(display);
     
     glutMainLoop();
-    
-    
     
     return 0;
 }
