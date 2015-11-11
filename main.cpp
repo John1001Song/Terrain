@@ -34,7 +34,7 @@ int angX = 0;
 int flag_map = 0;
 
 //flag used to turn on/off the light
-int flag_Light;
+int flag_Light = 1;
 
 //flag used to draw axis
 int flag_axis = 0;
@@ -44,11 +44,11 @@ float eye[] = {250, 250, 250};
 
 //light position
 float light_pos[] = {0, 0, 0, 1};
-float light_pos2[] = {200, 300, 200, 1};
+float light_pos1[] = {0, 50, 0, 1};
 
 //light
 float amb0[4] = {1, 1, 1, 1};
-float diff0[4] = {.31, .31, .31, 1};
+float diff0[4] = {1, .31, .31, 1};
 float spec0[4] = {.2, 0.2, 0.1, 1};
 
 //material
@@ -148,7 +148,7 @@ void kbd(unsigned char key, int x, int y){
             exit(0);
             break;
             
-            //press l or L to turn on light
+            //press l or L to turn on/off the light
         case 'l':
         case 'L':
             flag_Light = 0;
@@ -326,23 +326,6 @@ void init(){
     //glShadeModel(GL_SMOOTH);
     
     
-    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-    //glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
-
-    //glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
-    //glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
-    //glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
-    
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
-    //glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
-    
-    
-    
-    //glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT0);
-    //glEnable(GL_LIGHT1);
     
     
     
@@ -358,12 +341,39 @@ void display(){
     glLoadIdentity();
     
     
+    if (flag_Light == 0) {
+        glEnable(GL_LIGHTING);
+    }
+    
+    if (flag_Light == 1) {
+        glDisable(GL_LIGHTING);
+    }
+    
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
     
     //drawAxis();
     
     glColor3f(1, 1, 1);
     
     glPushMatrix();
+    
+    
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
+    
+    glLightfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
+    glLightfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
+    glLightfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
+    
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diff);
+    //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
+    //glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+    
+    
+    
+    
     
     gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
     
@@ -397,6 +407,7 @@ void display(){
 
 int main(int argc, char * argv[]) {
     
+    cout << "Suggest map size between 100 and 250. Too small # is hard to see and too big # will involve camera but with better details. \n";
     cout << "Please enter the map size: ";
     cin >> mapSize;
     
@@ -418,6 +429,12 @@ int main(int argc, char * argv[]) {
             printf("At (%d, %d), height is: %d\n", x, z, map[x][z]);
         }
     }
+    
+    cout << "key menue: \n";
+    cout << "'w' switch map, 'l' turn on light, 'k' turn off light, 'r' re-draw, 'h' draw XYZ axis, 'q' exit \n";
+    cout << "map movement: 'e' forward, 'c' backward, 'd' left turn, 'f' right turn \n";
+    cout << "eye movement: 'up' rotate with xz+, 'down' rotate with xz-, 'left' rotate around Y+ axis, 'right' rotate around Y- axis \n";
+
     
     glutKeyboardFunc(kbd);
    
